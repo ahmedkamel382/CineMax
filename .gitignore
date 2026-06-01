@@ -1,0 +1,46 @@
+# CINEMAX git ignores
+# Keep secrets, runtime data, and generated output out of the project.
+# Submit config.example.php only. Put the real config.php outside the
+# public web folder and never commit it.
+
+# ── Secrets & Local Config ──
+config.php
+.env
+.env.*
+!.env.example
+
+# ── Logs and Cloudflare Tunnel Files ──
+*.log
+error_log
+cloudflared-cinemax.err.log
+cloudflare_tunnel_url.txt
+cloudflare_*_pid.txt
+
+# ── Cloudflared Executable ──
+# (Ignore the actual executable so we don't bloat the repo,
+# but keep the .bat scripts that call it)
+cloudflared.exe
+cloudflared
+
+# ── Local Caches ──
+cache/
+/cache/*
+tmp/
+
+# ── Editor / OS files ──
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ── Dependencies ──
+node_modules/
+vendor/
+
+# ── Database dumps and backups ──
+*.sql.bak
+*_backup_*.sql
+cinemax_backup_*/
+*_backup_before_*/

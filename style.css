@@ -1,0 +1,738 @@
+/* ============================================================
+   CINEMAX EGYPT — STYLESHEET
+   Same design tokens as original. New additions marked NEW.
+   ============================================================ */
+
+/* ---------- 1. PAGE BASICS ---------- */
+body {
+  background-color: #0A0A0B;
+  color: white;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+::selection { background-color: #E11D48; color: white; }
+
+
+/* ---------- 2. ANIMATIONS ---------- */
+.animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to   { background-position: 200% 0; }
+}
+
+
+/* ---------- 3. NAVBAR ---------- */
+.nav-link {
+  font-size: 14px;
+  font-weight: 500;
+  color: #9ca3af;
+  transition: color 150ms;
+}
+.nav-link:hover { color: white; }
+
+.nav-action-btn {
+  flex-shrink: 0;
+  height: 34px;
+  min-width: 78px;
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 10px;
+  background: rgba(255,255,255,0.06);
+  color: #d1d5db;
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 800;
+  transition: background-color 150ms, border-color 150ms, color 150ms, transform 150ms;
+}
+.nav-action-btn:hover {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.22);
+  color: #fff;
+}
+.nav-action-btn:active { transform: scale(0.96); }
+.nav-action-btn:disabled {
+  cursor: progress;
+  opacity: .65;
+  transform: none;
+}
+
+@media (max-width: 430px) {
+  .nav-action-btn {
+    min-width: auto;
+    padding: 0 10px;
+    font-size: 11px;
+  }
+}
+
+
+/* ---------- 4. GLASS PANEL ---------- */
+.glass {
+  background-color: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.main-gradient {
+  background-image: linear-gradient(to right, #0A0A0B, rgba(10,10,11,0.8), transparent);
+}
+
+
+/* ---------- 5. BUTTONS ---------- */
+.btn-primary {
+  background-color: #E11D48;
+  color: white;
+  padding: 12px 32px;
+  border-radius: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 0 20px rgba(225, 29, 72, 0.3);
+  cursor: pointer;
+  transition: all 150ms;
+  font-size: 14px;
+}
+.btn-primary:hover    { background-color: rgba(225,29,72,0.9); }
+.btn-primary:active   { transform: scale(0.95); }
+.btn-primary:disabled { opacity: 0.5; pointer-events: none; }
+
+.btn-secondary {
+  background-color: rgba(255,255,255,0.1);
+  color: white;
+  padding: 12px 32px;
+  border-radius: 12px;
+  font-weight: 700;
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid rgba(255,255,255,0.1);
+  cursor: pointer;
+  transition: all 150ms;
+  font-size: 14px;
+}
+.btn-secondary:hover  { background-color: rgba(255,255,255,0.2); }
+.btn-secondary:active { transform: scale(0.95); }
+
+
+/* ---------- 6. INPUTS ---------- */
+.input-field {
+  background-color: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 9999px;
+  padding: 6px 16px;
+  font-size: 14px;
+  color: white;
+  transition: border-color 150ms;
+  width: 100%;
+}
+.input-field:focus {
+  outline: none;
+  border-color: #E11D48;
+}
+.input-field option {
+  background-color: #0F1115;
+  color: white;
+}
+textarea.input-field { border-radius: 12px; }
+select.input-field   { border-radius: 12px; }
+
+
+/* ---------- 7. RATING BADGE ---------- */
+.rating-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: rgba(0,0,0,0.5);
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.1);
+  font-size: 13px;
+}
+
+
+/* ---------- 8. SCROLLBAR ---------- */
+.custom-scrollbar::-webkit-scrollbar       { width: 6px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+
+/* ---------- 9. SECTION LABEL (NEW) ---------- */
+.section-label {
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: #6b7280;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+
+/* ---------- 10. TYPE BADGE (NEW) ---------- */
+.type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.type-badge.film    { background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
+.type-badge.concert { background: rgba(168,85,247,0.15); color: #c084fc; border: 1px solid rgba(168,85,247,0.3); }
+.type-badge.event   { background: rgba(251,146,60,0.15); color: #fb923c; border: 1px solid rgba(251,146,60,0.3); }
+
+
+/* ---------- 11. CAST CHIP (NEW) ---------- */
+.cast-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 150ms;
+  font-size: 13px;
+}
+.cast-chip:hover {
+  background: rgba(225,29,72,0.15);
+  border-color: rgba(225,29,72,0.4);
+  color: #fda4af;
+}
+.cast-chip img {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #1f2937;
+}
+.cast-chip .job {
+  font-size: 10px;
+  color: #6b7280;
+  margin-left: 2px;
+}
+
+
+/* ---------- 12. COMMENT CARD (NEW) ---------- */
+.comment-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 1.25rem;
+  transition: border-color 200ms;
+}
+.comment-card:hover { border-color: rgba(255,255,255,0.15); }
+.comment-stars { color: #f59e0b; letter-spacing: 1px; }
+.comment-date  { color: #6b7280; font-size: 11px; }
+
+
+/* ---------- 13. STAR PICKER (NEW) ---------- */
+.star-btn.active { color: #f59e0b; }
+.star-btn:hover  { color: #fbbf24; }
+
+
+/* ---------- 14. STREAMING BADGE (NEW) ---------- */
+.streaming-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 150ms;
+  text-decoration: none;
+  color: white;
+}
+.streaming-badge:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: white; }
+.streaming-badge.free  { border-color: rgba(74,222,128,0.3); color: #4ade80; }
+
+
+/* ---------- 15. SHOWTIME BUTTON (NEW) ---------- */
+.showtime-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 18px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 150ms;
+  min-width: 120px;
+  color: white;
+}
+.showtime-btn:hover {
+  border-color: #E11D48;
+  background: rgba(225,29,72,0.1);
+}
+.showtime-btn .time   { font-size: 18px; font-weight: 900; letter-spacing: 1px; }
+.showtime-btn .meta   { font-size: 10px; color: #9ca3af; margin-top: 3px; text-align: center; }
+.showtime-btn .price  { font-size: 12px; color: #E11D48; font-weight: 700; margin-top: 4px; }
+.showtime-btn .hall   { font-size: 10px; color: #6b7280; }
+
+
+/* ---------- 16. SEAT MAP (same as original + extras) ---------- */
+.seat-grid     { display: flex; flex-direction: column; gap: 8px; }
+.seat-row-wrap { display: flex; justify-content: center; gap: 6px; align-items: center; }
+.seat-row-lbl  { width: 20px; font-size: 9px; font-weight: 700; color: #4b5563; text-align: center; flex-shrink: 0; }
+.seat-btn {
+  width: 26px; height: 26px;
+  border-radius: 6px 6px 3px 3px;
+  border: 1px solid rgba(255,255,255,0.12);
+  font-size: 8px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 120ms;
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.3);
+  flex-shrink: 0;
+}
+.seat-btn:hover      { border-color: #E11D48; color: #E11D48; }
+.seat-btn.selected   { background: #E11D48; border-color: #E11D48; color: white; box-shadow: 0 0 10px rgba(225,29,72,0.5); transform: translateY(-2px); }
+.seat-btn.booked     { background: #1f2937; color: #374151; cursor: not-allowed; border-color: rgba(255,255,255,0.05); }
+
+.seat-cancel-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: .7rem;
+  background: rgba(255,255,255,.05);
+  padding: .35rem .55rem;
+  color: #e5e7eb;
+  font-size: .7rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.seat-cancel-chip:hover { border-color: #E11D48; color: #fff; }
+.seat-cancel-chip input { accent-color: #E11D48; }
+
+
+/* ---------- 17. CINEMA CARD (NEW) ---------- */
+.cinema-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 1rem 1.25rem;
+  transition: all 200ms;
+}
+.cinema-card:hover { border-color: rgba(225,29,72,0.4); background: rgba(225,29,72,0.05); }
+
+/* Governorate pill */
+.gov-pill {
+  padding: 5px 14px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
+  cursor: pointer;
+  transition: all 150ms;
+  color: #9ca3af;
+}
+.gov-pill:hover, .gov-pill.active {
+  background: rgba(225,29,72,0.2);
+  border-color: rgba(225,29,72,0.5);
+  color: white;
+}
+
+
+/* ---------- 18. MOVIE CARD (same as original) ---------- */
+.movie-card { cursor: pointer; }
+.movie-card .poster-wrap {
+  position: relative;
+  aspect-ratio: 2/3;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.05);
+  background: rgba(255,255,255,0.05);
+  transition: border-color 300ms;
+}
+.movie-card:hover .poster-wrap { border-color: #E11D48; }
+.movie-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 500ms; }
+.movie-card:hover img { transform: scale(1.1); }
+.movie-card .overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, black, rgba(0,0,0,0.4), transparent);
+  opacity: 0; transition: opacity 300ms;
+  display: flex; flex-direction: column; justify-content: flex-end; padding: 12px;
+}
+.movie-card:hover .overlay { opacity: 1; }
+.movie-card .rating-top {
+  position: absolute; top: 8px; left: 8px;
+  opacity: 0; transition: opacity 300ms;
+}
+.movie-card:hover .rating-top { opacity: 1; }
+
+
+/* ---------- 19. SCREEN MOCKUP ---------- */
+.screen-bar {
+  height: 4px;
+  background: linear-gradient(to right, transparent, #E11D48, transparent);
+  border-radius: 2px;
+  margin-bottom: 4px;
+}
+
+/* ---------- 20. BOOKING SUMMARY ---------- */
+.booking-summary-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+}
+
+/* ---------- 21. SKELETON LOADER (NEW) ---------- */
+.skeleton {
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0.04) 25%,
+    rgba(255,255,255,0.08) 50%,
+    rgba(255,255,255,0.04) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 640px) {
+  .seat-btn { width: 22px; height: 22px; font-size: 7px; }
+  .seat-row-wrap { gap: 4px; }
+}
+
+/* ============================================================
+   ACCORDION — Governorate collapsible UI
+   ============================================================ */
+.gov-accordion-header { background: rgba(255,255,255,0.02); }
+.gov-accordion-header:hover { background: rgba(255,255,255,0.05); }
+.gov-accordion-header[aria-expanded="true"] { background: rgba(225,29,72,0.07); }
+.gov-chevron { display:inline-block; transition: transform 0.25s ease; }
+.gov-chevron.rotate-180 { transform: rotate(180deg); }
+.gov-accordion-body { transition: all 0.2s ease; }
+
+/* Cinema select buttons inside booking accordion */
+.cinema-select-btn:hover { background: rgba(225,29,72,0.08); }
+
+/* Showtime buttons */
+.showtime-btn {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 2px; padding: 10px 14px; border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.03);
+  cursor: pointer; transition: all 0.2s;
+  min-width: 80px;
+}
+.showtime-btn:hover { border-color: #E11D48; background: rgba(225,29,72,0.1); }
+.showtime-btn .time  { font-size: 1rem; font-weight: 900; color: #fff; }
+.showtime-btn .hall  { font-size: 9px; color: #9ca3af; }
+.showtime-btn .meta  { font-size: 9px; color: #6b7280; font-weight:700; letter-spacing:.1em; }
+.showtime-btn .price { font-size: 10px; color: #E11D48; font-weight:800; }
+
+/* Booking summary card */
+.booking-summary-card {
+  background: rgba(225,29,72,0.05);
+  border: 1px solid rgba(225,29,72,0.15);
+  border-radius: 16px; padding: 20px;
+}
+
+/* Type badges */
+.type-badge { font-size:10px; font-weight:900; padding:3px 10px; border-radius:20px; letter-spacing:.1em; text-transform:uppercase; }
+.type-badge.film  { background:rgba(225,29,72,0.15); color:#E11D48; }
+.type-badge.event { background:rgba(99,102,241,0.15); color:#818cf8; }
+.audience-qr-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 1.25rem;
+  align-items: stretch;
+}
+
+.audience-qr-info,
+.audience-qr-card {
+  background: rgba(255, 255, 255, .06);
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, .35);
+}
+
+.audience-url {
+  overflow-wrap: anywhere;
+  border: 1px solid rgba(255, 255, 255, .1);
+  border-radius: .9rem;
+  background: rgba(0, 0, 0, .28);
+  padding: .85rem 1rem;
+  color: #f9fafb;
+  font-weight: 800;
+}
+
+.audience-qr-card {
+  display: flex;
+  min-height: 380px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.audience-qr-card canvas {
+  width: 300px;
+  height: 300px;
+  border-radius: 1rem;
+  background: #fff;
+  padding: .5rem;
+}
+
+@media (max-width: 900px) {
+  .audience-qr-shell {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* ============================================================
+   Mobile forgot-password recovery improvements
+   - Keeps the 6-digit code field easy to type on phones.
+   - Keeps the confirm button reachable above the mobile keyboard.
+============================================================ */
+.forgot-code-input {
+  font-size: 1.45rem;
+  font-weight: 900;
+  letter-spacing: .45rem;
+  font-variant-numeric: tabular-nums;
+  caret-color: #E11D48;
+}
+
+.forgot-reset-button {
+  min-height: 54px;
+  touch-action: manipulation;
+}
+
+@media (max-width: 640px) {
+  .forgot-modal {
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+    padding: 0 !important;
+    overflow: hidden;
+  }
+
+  .forgot-modal-card {
+    width: 100% !important;
+    max-width: none !important;
+    height: 100dvh;
+    max-height: 100dvh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 0 !important;
+    padding: 1rem !important;
+    padding-bottom: calc(1.25rem + env(safe-area-inset-bottom)) !important;
+  }
+
+  .forgot-modal h2 {
+    font-size: 1.45rem !important;
+    line-height: 1.1;
+  }
+
+  .forgot-modal .input-field,
+  .forgot-modal button,
+  .forgot-modal label {
+    font-size: 16px; /* prevents iOS input zoom */
+  }
+
+  .forgot-code-input {
+    min-height: 60px;
+    font-size: 1.65rem !important;
+    letter-spacing: .55rem;
+  }
+
+  .forgot-reset-area {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    margin-left: -1rem;
+    margin-right: -1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-bottom: calc(.9rem + env(safe-area-inset-bottom));
+    background: rgba(10, 10, 11, .96);
+    backdrop-filter: blur(14px);
+  }
+
+  .forgot-reset-button {
+    min-height: 58px;
+    font-size: 16px !important;
+  }
+}
+
+
+/* ---------- Mobile account button fixes ---------- */
+#login-btn {
+  max-width: min(42vw, 220px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#login-btn.is-account-btn {
+  font-size: 12px;
+  line-height: 1.1;
+}
+@media (max-width: 640px) {
+  #login-btn {
+    max-width: 34vw;
+    padding-left: .55rem !important;
+    padding-right: .55rem !important;
+    font-size: 11px !important;
+  }
+  #login-btn.is-account-btn {
+    font-size: 10px !important;
+  }
+}
+@media (max-width: 380px) {
+  #login-btn { max-width: 30vw; font-size: 10px !important; }
+  .nav-action-btn { font-size: 10px; padding-left: .45rem; padding-right: .45rem; }
+}
+
+/* ---------- Mobile layout polish for the user site ---------- */
+@media (max-width: 640px) {
+  body {
+    overflow: hidden;
+  }
+
+  nav {
+    min-height: 64px;
+    padding-left: .75rem !important;
+    padding-right: .75rem !important;
+    gap: .5rem !important;
+  }
+
+  nav > div:first-child {
+    min-width: 0;
+    gap: .5rem !important;
+  }
+
+  .nav-action-btn {
+    height: 32px;
+    min-width: auto;
+    max-width: 32vw;
+    overflow: hidden;
+    padding-left: .55rem;
+    padding-right: .55rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  #home-view,
+  #details-view,
+  #person-view,
+  #support-view,
+  #requests-view {
+    height: 100dvh !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #details-view {
+    padding-top: 4rem !important;
+  }
+
+  #details-view > .relative {
+    min-height: 72dvh;
+  }
+
+  #details-view > .relative > .absolute.bottom-0 {
+    align-items: flex-start !important;
+    gap: 1rem !important;
+    padding: 1rem !important;
+  }
+
+  #details-title {
+    font-size: clamp(1.9rem, 10vw, 2.6rem) !important;
+    line-height: .95 !important;
+    overflow-wrap: anywhere;
+  }
+
+  #details-view .max-w-7xl {
+    padding: 1.5rem 1rem 5rem !important;
+  }
+
+  #details-view .grid {
+    gap: 1.5rem !important;
+  }
+
+  #details-desc,
+  #comments-list p {
+    overflow-wrap: anywhere;
+  }
+
+  #community-score-block,
+  #comment-form-block,
+  #comment-login-prompt,
+  #comments-list .glass {
+    border-radius: 1rem !important;
+    padding: 1rem !important;
+  }
+
+  #community-score-block > .flex {
+    align-items: flex-start !important;
+    flex-wrap: wrap;
+    gap: .8rem !important;
+  }
+
+  #community-avg {
+    font-size: 2.5rem !important;
+    line-height: 1 !important;
+  }
+
+  #community-stars {
+    max-width: 100%;
+    font-size: 1rem !important;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  #comment-form-block > .flex {
+    align-items: flex-start !important;
+    flex-wrap: wrap;
+    gap: .6rem !important;
+  }
+
+  #star-picker {
+    flex-wrap: wrap;
+    max-width: 100%;
+    row-gap: .2rem;
+  }
+
+  #star-picker .star-btn {
+    font-size: 1.65rem !important;
+    line-height: 1;
+  }
+
+  #comment-form-block .input-field,
+  #comment-login-prompt button,
+  #submit-comment-btn,
+  #load-more-comments-btn button {
+    min-height: 44px;
+    width: 100%;
+    font-size: 16px;
+  }
+
+  #comments-list .glass > .flex {
+    align-items: flex-start !important;
+    flex-direction: column;
+  }
+
+  #comments-list .glass > .flex > div:last-child {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    max-width: 100%;
+  }
+}

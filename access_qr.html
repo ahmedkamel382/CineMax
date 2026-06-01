@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CINEMAX Access QR</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <style>
+    body { min-height: 100vh; background: #09090b; color: #fff; font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    .card { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); border-radius: 1.25rem; padding: 1.25rem; }
+    .btn { border: 1px solid #e11d48; border-radius: .9rem; padding: .8rem 1rem; background: #e11d48; color: #fff; font-size: .8rem; font-weight: 900; }
+    .btn-muted { border: 1px solid rgba(255,255,255,.12); border-radius: .9rem; padding: .8rem 1rem; background: rgba(255,255,255,.06); color: #d1d5db; font-size: .8rem; font-weight: 900; }
+    .input { width: 100%; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); border-radius: .9rem; padding: .85rem 1rem; outline: none; color: #fff; }
+    .input:focus { border-color: #e11d48; }
+    .access-url { overflow-wrap: anywhere; border: 1px solid rgba(255,255,255,.1); border-radius: .9rem; background: rgba(0,0,0,.22); padding: .85rem 1rem; color: #f9fafb; font-weight: 800; }
+    canvas { width: 280px; height: 280px; border-radius: 1rem; background: #fff; padding: .5rem; }
+  </style>
+</head>
+<body>
+  <main class="max-w-5xl mx-auto p-5 md:p-10">
+    <header class="mb-8">
+      <h1 class="text-3xl md:text-5xl font-black tracking-tight">CINEMAX</h1>
+      <p class="text-gray-400 mt-2">Access QR for the active Cloudflare tunnel or local Wi-Fi link.</p>
+    </header>
+
+    <section class="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-5">
+      <div class="card">
+        <h2 class="text-2xl font-black mb-2">Generate Website QR</h2>
+        <p class="text-sm text-gray-400 mb-6">Start Apache and MySQL in XAMPP on the admin laptop. If the Cloudflare tunnel is running, this page updates the QR automatically to the newest public link.</p>
+
+        <label class="text-xs font-black uppercase tracking-widest text-gray-500">Laptop IPv4 or Host</label>
+        <div class="flex flex-col md:flex-row gap-2 mt-2">
+          <input id="host-input" class="input" placeholder="Example: 192.168.1.15" />
+          <button class="btn" id="generate-btn">Generate QR</button>
+        </div>
+
+        <div class="mt-5">
+          <label class="text-xs font-black uppercase tracking-widest text-gray-500">User Link</label>
+          <div id="url-text" class="access-url mt-2"></div>
+          <div id="link-status" class="text-xs text-gray-400 mt-2"></div>
+        </div>
+
+        <div class="flex flex-wrap gap-2 mt-4">
+          <button class="btn-muted" id="copy-btn">Copy Link</button>
+          <a class="btn-muted" href="index.html">Open Website</a>
+          <a class="btn-muted" href="admin.html?admin_scope=manager">Manager Admin</a>
+          <a class="btn-muted" href="admin.html?admin_scope=regional">Regional Admin</a>
+        </div>
+
+        <p class="text-xs text-yellow-300 mt-5">Until the project is hosted online, the public QR works only while this laptop, XAMPP, and the Cloudflare tunnel are running. The quick-tunnel link can change each day.</p>
+      </div>
+
+      <div class="card flex flex-col items-center justify-center min-h-[380px]">
+        <canvas id="qr-canvas" width="280" height="280"></canvas>
+        <div class="text-center text-sm text-gray-400 mt-4">Scan to open CINEMAX</div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const hostInput = document.getElementById('host-input');
+    const urlText = document.getElementById('url-text');
+    const linkStatus = document.getElementById('link-status');
+    const qrCanvas = document.getElementById('qr-canvas');
+    const savedHost = localStorage.getItem('cinemax_public_host') || '';
+
+    function normalizeHost(value) {
+      return String(value || '').trim().replace(/^https?:\/\//i, '').replace(/\/.*$/, '');
+    }
+
+    function isLocalHost(host) {
+      const cleanHost = normalizeHost(host).split(':')[0].toLowerCase();
+      return cleanHost === 'localhost' || cleanHost === '127.0.0.1' || cleanHost === '';
+    }
+
+    function isPrivateHost(host) {
+      const cleanHost = normalizeHost(host).split(':')[0].toLowerCase();
+      return /^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/.test(cleanHost);
+    }
+
+    function isTryCloudflareHost(host) {
+      return normalizeHost(host).split(':')[0].toLowerCase().endsWith('.trycloudflare.com');
+    }
+
+    function shouldReplaceHost(host) {
+      return isLocalHost(host) || isPrivateHost(host);
+    }
+
+    function setStatus(message, type = 'muted') {
+      if (!linkStatus) return;
+      const colors = {
+        ok: 'text-green-300',
+        warn: 'text-yellow-300',
+        error: 'text-rose-300',
+        muted: 'text-gray-400'
+      };
+      linkStatus.className = `text-xs mt-2 ${colors[type] || colors.muted}`;
+      linkStatus.textContent = message || '';
+    }
+
+    function basePath() {
+      return location.pathname.replace(/access_qr\.html.*$/i, '');
+    }
+
+    function buildUrl(host) {
+      const cleanHost = normalizeHost(host) || location.host;
+      const protocol = isTryCloudflareHost(cleanHost) ? 'https:' : (location.protocol === 'https:' ? 'https:' : 'http:');
+      return `${protocol}//${cleanHost}${basePath()}index.html`;
+    }
+
+    function updateQr() {
+      const host = normalizeHost(hostInput.value);
+      const invalidForPhone = isLocalHost(host);
+      const url = invalidForPhone ? 'Enter your laptop Wi-Fi IPv4 address first. Example: 192.168.1.37' : buildUrl(host);
+      if (!invalidForPhone) hostInput.value = host;
+      urlText.textContent = url;
+      if (!invalidForPhone && !isTryCloudflareHost(host)) localStorage.setItem('cinemax_public_host', host);
+      if (window.QRCode && !invalidForPhone) {
+        QRCode.toCanvas(qrCanvas, url, { width: 280, margin: 2, color: { dark: '#09090b', light: '#ffffff' } });
+      } else {
+        const ctx = qrCanvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, qrCanvas.width, qrCanvas.height);
+        ctx.fillStyle = '#09090b';
+        ctx.font = 'bold 18px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Enter laptop IP', qrCanvas.width / 2, qrCanvas.height / 2 - 10);
+        ctx.font = '14px Arial';
+        ctx.fillText('not localhost', qrCanvas.width / 2, qrCanvas.height / 2 + 18);
+      }
+    }
+
+    async function loadDetectedHost() {
+      if (!['localhost', '127.0.0.1'].includes(location.hostname)) return;
+
+      try {
+        const res = await fetch('network_info.php', { cache: 'no-store' });
+        const data = await res.json();
+        if (data.status !== 'success') return;
+
+        const currentHost = normalizeHost(hostInput.value);
+        const freshTunnelHost = (data.tunnel_is_fresh && data.tunnel_is_alive && data.tunnel_host)
+          ? normalizeHost(data.tunnel_host)
+          : '';
+        const detectedIp = normalizeHost(data.detected_ip || '');
+        const currentIsCloudflare = isTryCloudflareHost(currentHost);
+
+        if (freshTunnelHost) {
+          if (freshTunnelHost !== currentHost) {
+            hostInput.value = freshTunnelHost;
+            localStorage.removeItem('cinemax_public_host');
+            updateQr();
+          }
+          setStatus(`Active Cloudflare tunnel detected${data.tunnel_age_seconds !== null ? ` (${Math.round(data.tunnel_age_seconds / 60)} min old)` : ''}.`, 'ok');
+          return;
+        }
+
+        if (currentIsCloudflare) {
+          localStorage.removeItem('cinemax_public_host');
+          if (detectedIp) {
+            hostInput.value = detectedIp;
+            updateQr();
+            setStatus('No active Cloudflare tunnel was detected. QR changed to local Wi-Fi link. Run START_CLOUDFLARE_DEMO.bat to create a new public link.', 'warn');
+          } else {
+            hostInput.value = '';
+            updateQr();
+            setStatus('The saved Cloudflare link is stale. Run START_CLOUDFLARE_DEMO.bat, then this page will update automatically.', 'error');
+          }
+          return;
+        }
+
+        if (detectedIp && shouldReplaceHost(currentHost)) {
+          hostInput.value = detectedIp;
+          updateQr();
+          setStatus('Using local Wi-Fi link. For internet access, run START_CLOUDFLARE_DEMO.bat.', 'warn');
+          return;
+        }
+
+        if (detectedIp) {
+          setStatus('Using the entered host. No active Cloudflare tunnel was detected.', 'muted');
+        }
+      } catch (e) {
+        console.warn('Could not detect local network IP.', e);
+        setStatus('Could not check the current tunnel. Make sure Apache is running.', 'warn');
+      }
+    }
+
+    async function copyUrl() {
+      const url = urlText.textContent;
+      try {
+        await navigator.clipboard.writeText(url);
+        alert('Access link copied.');
+      } catch (e) {
+        prompt('Copy this link:', url);
+      }
+    }
+
+    const currentIsPublic = !isLocalHost(location.hostname) && !isPrivateHost(location.hostname);
+    hostInput.value = currentIsPublic
+      ? location.host
+      : (savedHost && !shouldReplaceHost(savedHost) && !isTryCloudflareHost(savedHost) ? savedHost : '');
+    document.getElementById('generate-btn').addEventListener('click', updateQr);
+    document.getElementById('copy-btn').addEventListener('click', copyUrl);
+    updateQr();
+    loadDetectedHost();
+    setInterval(loadDetectedHost, 15000);
+  </script>
+</body>
+</html>

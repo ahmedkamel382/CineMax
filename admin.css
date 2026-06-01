@@ -1,0 +1,145 @@
+.card { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); border-radius: 1.25rem; padding: 1.25rem; }
+.btn, .btn-muted, .tab { border: 1px solid rgba(255,255,255,.12); border-radius: .9rem; padding: .7rem 1rem; font-size: .8rem; font-weight: 800; transition: .2s ease; }
+.btn { background: #e11d48; color: #fff; border-color: #e11d48; }
+.btn:hover { filter: brightness(1.1); }
+.btn:disabled, .btn-muted:disabled { cursor: wait; opacity: .55; filter: none; }
+.btn-muted, .tab { background: rgba(255,255,255,.06); color: #d1d5db; }
+.btn-muted:hover, .tab:hover, .tab.active { border-color: #e11d48; color: #fff; background: rgba(225,29,72,.16); }
+.admin-header-actions { display: flex; align-items: center; gap: .7rem; flex-wrap: wrap; }
+.refresh-status { color: #9ca3af; font-size: .72rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+.table-wrap { overflow-x: auto; border-radius: 1rem; border: 1px solid rgba(255,255,255,.08); }
+table { width: 100%; border-collapse: collapse; min-width: 850px; }
+th, td { padding: .85rem; border-bottom: 1px solid rgba(255,255,255,.08); text-align: left; font-size: .78rem; vertical-align: top; }
+th { color: #9ca3af; text-transform: uppercase; letter-spacing: .08em; font-size: .68rem; }
+.badge { display: inline-block; border-radius: 999px; padding: .2rem .55rem; font-size: .68rem; font-weight: 900; }
+.badge-paid { background: rgba(34,197,94,.15); color: #86efac; }
+.badge-pending { background: rgba(234,179,8,.15); color: #fde047; }
+.badge-bad { background: rgba(239,68,68,.15); color: #fca5a5; }
+.seat-check-list { display: flex; flex-wrap: wrap; gap: .45rem; min-width: 160px; }
+.seat-check { display: inline-flex; align-items: center; gap: .35rem; border: 1px solid rgba(255,255,255,.12); border-radius: 999px; padding: .25rem .55rem; background: rgba(255,255,255,.05); color: #e5e7eb; font-weight: 800; }
+.seat-check input { accent-color: #e11d48; }
+.input { width: 100%; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); border-radius: .9rem; padding: .8rem 1rem; outline: none; }
+.input:focus { border-color: #e11d48; }
+.textarea { width: 100%; min-height: 95px; resize: vertical; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); border-radius: .9rem; padding: .8rem 1rem; outline: none; color: #fff; }
+.textarea:focus { border-color: #e11d48; }
+.support-message { white-space: pre-wrap; background: rgba(0,0,0,.18); border: 1px solid rgba(255,255,255,.08); border-radius: .9rem; padding: 1rem; color: #e5e7eb; }
+.support-thread { margin-top: 1rem; display: grid; gap: .7rem; }
+.support-reply { white-space: pre-wrap; background: rgba(225,29,72,.08); border: 1px solid rgba(225,29,72,.16); border-radius: .9rem; padding: .85rem; color: #f3f4f6; }
+.access-url { margin-top: .5rem; overflow-wrap: anywhere; border: 1px solid rgba(255,255,255,.1); border-radius: .9rem; background: rgba(0,0,0,.22); padding: .85rem 1rem; color: #f9fafb; font-weight: 800; }
+.qr-card { display: flex; min-height: 360px; flex-direction: column; align-items: center; justify-content: center; }
+.qr-card canvas { width: 260px; height: 260px; border-radius: 1rem; background: #fff; padding: .5rem; }
+.manager-layout { display: grid; grid-template-columns: minmax(280px, 380px) minmax(0, 1fr); gap: 1rem; align-items: start; }
+.health-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: .75rem; }
+.health-item { border: 1px solid rgba(255,255,255,.08); border-radius: 1rem; padding: .9rem; background: rgba(0,0,0,.18); }
+.region-cinema-preview { border: 1px solid rgba(255,255,255,.08); border-radius: 1rem; padding: .8rem; background: rgba(0,0,0,.18); }
+.mini-chip { display: inline-flex; align-items: center; border: 1px solid rgba(255,255,255,.12); border-radius: 999px; padding: .28rem .6rem; background: rgba(255,255,255,.05); color: #e5e7eb; font-size: .72rem; font-weight: 800; }
+.cinema-monitor-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 1rem; align-items: start; }
+.cinema-monitor-card.cinema-waiting { border-color: rgba(225,29,72,.42); background: rgba(225,29,72,.07); }
+.live-dot { width: .72rem; height: .72rem; border-radius: 999px; background: #ef4444; box-shadow: 0 0 0 rgba(239,68,68,.65); animation: livePulse 1.15s infinite; flex: 0 0 auto; }
+.cinema-reservation-list { display: grid; gap: .65rem; max-height: 360px; overflow-y: auto; padding-right: .25rem; }
+.cinema-reservation-row { display: flex; justify-content: space-between; gap: .8rem; border: 1px solid rgba(255,255,255,.08); border-radius: .9rem; background: rgba(0,0,0,.2); padding: .8rem; }
+.admin-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(9,9,11,.82);
+  backdrop-filter: blur(16px);
+}
+.admin-modal-card {
+  width: min(100%, 460px);
+  border: 1px solid rgba(225,29,72,.28);
+  border-radius: 1.25rem;
+  background: linear-gradient(180deg, rgba(32,13,20,.98), rgba(15,17,21,.98));
+  box-shadow: 0 24px 70px rgba(0,0,0,.45);
+  padding: 1.5rem;
+}
+@keyframes livePulse {
+  0% { box-shadow: 0 0 0 0 rgba(239,68,68,.75); transform: scale(1); }
+  70% { box-shadow: 0 0 0 .55rem rgba(239,68,68,0); transform: scale(1.08); }
+  100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); transform: scale(1); }
+}
+@media (max-width: 900px) {
+  .manager-layout { grid-template-columns: 1fr; }
+}
+
+/* Manager: multi-region admin controls */
+.region-check-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .35rem .75rem; max-height: 220px; overflow-y: auto; padding: .5rem; border: 1px solid rgba(255,255,255,.1); border-radius: .75rem; background: rgba(255,255,255,.03); }
+.region-check { display: flex; align-items: center; gap: .45rem; font-size: .82rem; color: #d1d5db; cursor: pointer; }
+.region-check input { accent-color: #e11d48; }
+.admin-account-row { padding: 1rem; }
+.admin-account-row select[multiple] { min-width: 200px; }
+
+/* Payment verification QR modal: responsive for many seats */
+.payment-qr-modal {
+  align-items: center;
+  justify-content: center;
+}
+.payment-qr-dialog {
+  width: min(960px, 100%);
+  max-height: min(88vh, 760px);
+  overflow-y: auto;
+}
+.payment-qr-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: .75rem;
+  align-items: start;
+}
+.payment-seat-qr-card {
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 1rem;
+  background: rgba(0,0,0,.2);
+  padding: .75rem;
+}
+.payment-seat-qr-box {
+  display: inline-block;
+  max-width: 100%;
+  border-radius: 1rem;
+  background: #fff;
+  padding: .65rem;
+  color: #000;
+}
+.payment-seat-qr-box canvas {
+  width: min(170px, 62vw) !important;
+  height: min(170px, 62vw) !important;
+}
+.payment-seat-ticket-code {
+  margin-top: .45rem;
+  max-width: 170px;
+  overflow-wrap: anywhere;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1.25;
+}
+@media (max-width: 640px) {
+  .admin-modal-backdrop, .payment-qr-modal {
+    align-items: flex-start;
+    padding: .65rem;
+  }
+  .payment-qr-dialog {
+    width: 100%;
+    max-height: 92vh;
+    margin-top: .5rem;
+    padding: 1rem;
+    border-radius: 1rem;
+  }
+  .payment-qr-grid {
+    grid-template-columns: 1fr;
+    gap: .65rem;
+  }
+  .payment-seat-qr-card {
+    padding: .65rem;
+  }
+  .payment-seat-qr-box canvas {
+    width: min(150px, 56vw) !important;
+    height: min(150px, 56vw) !important;
+  }
+  .payment-seat-ticket-code {
+    max-width: min(150px, 56vw);
+    font-size: 9px;
+  }
+}
