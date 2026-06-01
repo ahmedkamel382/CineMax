@@ -1,4 +1,3 @@
-````markdown
 # 🎬 CINEMAX EGYPT
 
 **Next-Generation Cinema Management & Booking System**
