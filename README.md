@@ -173,9 +173,9 @@ admin.html
 
 This project was built with a **Vertical Feature Slice** methodology, where each developer owned features end-to-end (from SQL constraints to UI rendering).
 
-* ** Ahmed Khalid Mohamed** – UI Layout & Navigation, Movie Discovery (Home, Search, Details), TMDB API Integration, and Database Design & Seeding.
-* ** Adel Alaa** – Customer Booking Journey, Interactive Seat Reservations, Payment Processing, QR Ticketing, and User Account Management (Auth, Bookings, Requests).
-* ** Bassel Adel** – Admin Operations & Dashboards, Regional Management, Payment & Refund Control Workflows, Support Threads, and the Virtual Cinema Extension.
+* **Ahmed Khalid Mohamed** – UI Layout & Navigation, Movie Discovery (Home, Search, Details), TMDB API Integration, and Database Design & Seeding.
+* **Adel Alaa** – Customer Booking Journey, Interactive Seat Reservations, Payment Processing, QR Ticketing, and User Account Management (Auth, Bookings, Requests).
+* **Bassel Adel** – Admin Operations & Dashboards, Regional Management, Payment & Refund Control Workflows, Support Threads, and the Virtual Cinema Extension.
 
 ---
 
