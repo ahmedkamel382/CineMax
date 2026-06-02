@@ -130,6 +130,43 @@ To safely terminate the connection:
 STOP_CLOUDFLARE_TUNNEL.bat
 ```
 
+## 🔑 Demo Accounts
+
+To explore the tiered **Role-Based Access Control (RBAC)** system and booking workflows, you can log in using the following pre-configured demo accounts.
+
+---
+
+### Accessing the Dashboards
+
+#### 🎟️ Customer Portal
+
+Navigate to:
+
+```text id="91eh4u"
+index.html
+```
+
+Or click **"Sign In"** on the main home page.
+
+#### 👑 Admin Portal
+
+Navigate directly to:
+
+```text id="10y8d6"
+admin.html
+```
+
+---
+
+## 👥 Available Demo Accounts
+
+| Role                          | Email                                    | Password         | Access Level                                                                                  |
+| ----------------------------- | ---------------------------------------- | ---------------- | --------------------------------------------------------------------------------------------- |
+| **Manager Admin**             | `manager.cinemax2026@gmail.com`          | `Manager@2026!`  | Full global access to all regions, system tools, payments, and users.                         |
+| **Cairo Regional Admin**      | `cairo.admin.cinemax2026@gmail.com`      | `Regional@2026!` | Sandboxed access limited to Cairo governorate data only.                                      |
+| **Alexandria Regional Admin** | `alexandria.admin.cinemax2026@gmail.com` | `Regional@2026!` | Sandboxed access limited to Alexandria governorate data only.                                 |
+| **Normal User**               | `user.cinemax2026@gmail.com`             | `User@2026!`     | Standard customer access including booking, history, community reviews, and support features. |
+
 ---
 
 ## 👥 The Team
