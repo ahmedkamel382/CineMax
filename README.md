@@ -145,4 +145,3 @@ This project was built with a **Vertical Feature Slice** methodology, where each
 ## 📜 License
 
 This project was developed as an academic/portfolio project. All movie data, posters, and imagery belong to their respective copyright holders and are fetched via TMDB.
-````
