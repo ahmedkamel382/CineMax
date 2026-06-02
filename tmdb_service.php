@@ -9,8 +9,8 @@
  * users cannot see it in DevTools.
  *
  * USED BY: api.php (actions movies_now_showing, movies_upcoming,
- *                   movie_trailer, movie_cast, movie_details,
- *                   streaming_providers, person_details)
+ * movie_trailer, movie_cast, movie_details,
+ * streaming_providers, person_details)
  *
  * RESPONSE SHAPE: identical to what the old in-browser
  * fetchMovies() returned, so the frontend grid keeps working
@@ -110,17 +110,24 @@ function tmdb_genres(): array {
  * Matches the structure that fetchMovies() used to return in script.js.
  */
 function tmdb_format_movie(array $m, array $genres, string $type): array {
+    $posterUrl = !empty($m['poster_path'])
+        ? TMDB_IMG500 . $m['poster_path']
+        : 'https://via.placeholder.com/500x750?text=No+Poster';
+
+    // The hero/details "cover" uses TMDB backdrop when available.
+    // If TMDB has no backdrop, reuse the same main poster shown in the small card
+    // instead of showing an unrelated default cinema photo.
+    $backdropUrl = !empty($m['backdrop_path'])
+        ? TMDB_IMGORIG . $m['backdrop_path']
+        : $posterUrl;
+
     return [
         'id'          => (string)$m['id'],
         'tmdbId'      => (int)$m['id'],
         'title'       => $m['title'] ?? $m['original_title'] ?? 'Unknown',
         'description' => $m['overview'] ?? '',
-        'posterUrl'   => !empty($m['poster_path'])
-            ? TMDB_IMG500 . $m['poster_path']
-            : 'https://via.placeholder.com/500x750?text=No+Poster',
-        'backdropUrl' => !empty($m['backdrop_path'])
-            ? TMDB_IMGORIG . $m['backdrop_path']
-            : 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1920&q=80',
+        'posterUrl'   => $posterUrl,
+        'backdropUrl' => $backdropUrl,
         'trailerUrl'  => '',
         'imdbRating'  => !empty($m['vote_average']) ? number_format($m['vote_average'], 1) : '–',
         'rtRating'    => !empty($m['vote_average']) ? floor($m['vote_average'] * 10) . '%' : '–%',
@@ -138,18 +145,20 @@ function tmdb_format_movie(array $m, array $genres, string $type): array {
 /**
  * tmdb_get_curated_movies($type)
  * Reproduces the curation logic from the old in-browser fetchMovies():
- *   • merges EG + US regions
- *   • date-filters (now_playing = released, upcoming = future)
- *   • drops streaming-exclusive titles
- *   • mixes 4 Arabic + 8 English, sorted by popularity
+ * • merges EG + US regions
+ * • date-filters (now_playing = released, upcoming = future)
+ * • drops streaming-exclusive titles
+ * • mixes 4 Arabic + 8 English, sorted by popularity
  *
  * Returns an array of frontend-ready movie objects.
  */
 function tmdb_get_curated_movies(string $type): array {
     $genres = tmdb_genres();
 
+    // EXPLICITLY filter by English language for the "Global/US" fetch
+    // to prevent popular Indian/Hindi movies from filling the homepage.
     $resEG = tmdb_get("/movie/$type", ['page' => 1, 'region' => 'EG']);
-    $resUS = tmdb_get("/movie/$type", ['page' => 1, 'region' => 'US']);
+    $resUS = tmdb_get("/movie/$type", ['page' => 1, 'region' => 'US', 'with_original_language' => 'en']);
 
     $combined = array_merge($resEG['results'] ?? [], $resUS['results'] ?? []);
 
@@ -242,7 +251,7 @@ function tmdb_get_bookable_movies(PDO $pdo, int $limit = 12): array {
                 'title' => $row['movie_title'] ?? 'Unknown',
                 'description' => '',
                 'posterUrl' => $row['movie_poster'] ?: 'https://via.placeholder.com/500x750?text=No+Poster',
-                'backdropUrl' => 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1920&q=80',
+                'backdropUrl' => $row['movie_poster'] ?: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1920&q=80',
                 'trailerUrl' => '',
                 'imdbRating' => '-',
                 'rtRating' => '-%',
@@ -276,7 +285,7 @@ function tmdb_get_trailer(int $tmdbId): string {
 
     // Drop DVD/Blu-ray promos when we have alternatives
     $clean = array_filter($trailers, fn($t) =>
-        !preg_match('/dvd|vhs|blu-ray|home video|buy on/i', $t['name'] ?? '')
+    !preg_match('/dvd|vhs|blu-ray|home video|buy on/i', $t['name'] ?? '')
     );
     if ($clean) $trailers = $clean;
 
@@ -340,9 +349,14 @@ function tmdb_get_cast(int $tmdbId): array {
  */
 function tmdb_get_streaming(int $tmdbId): array {
     $data = tmdb_get("/movie/$tmdbId/watch/providers");
-    $providers = $data['results']['EG']['flatrate']
-        ?? $data['results']['US']['flatrate']
-        ?? [];
+
+    // First try Egypt, then try US fallback if Egypt has no data
+    $providers = $data['results']['EG']['flatrate'] ?? null;
+
+    if (empty($providers)) {
+        $providers = $data['results']['US']['flatrate'] ?? [];
+    }
+
     return array_map(fn($p) => [
         'provider_id'   => (int)($p['provider_id'] ?? 0),
         'provider_name' => $p['provider_name'] ?? '',
@@ -358,15 +372,23 @@ function tmdb_get_streaming(int $tmdbId): array {
 function tmdb_get_movie_details(int $tmdbId): ?array {
     $m = tmdb_get("/movie/$tmdbId");
     if (!$m || empty($m['id'])) return null;
-    $today  = date('Y-m-d');
-    $type   = !empty($m['release_date']) && $m['release_date'] > $today ? 'upcoming' : 'now_playing';
     $genres = tmdb_genres();
 
     // /movie/{id} returns genres as full objects, not ids — normalize first
     if (!empty($m['genres']) && empty($m['genre_ids'])) {
         $m['genre_ids'] = array_map(fn($g) => (int)$g['id'], $m['genres']);
     }
-    return tmdb_format_movie($m, $genres, $type);
+
+    // Format the movie normally...
+    $formattedMovie = tmdb_format_movie($m, $genres, 'now_playing');
+
+    // ...but override the flags since this is an explicit catalog lookup,
+    // NOT a movie pulled from our active cinema schedule.
+    $formattedMovie['isCurrentlyPlaying'] = false;
+    $formattedMovie['isComingSoon']       = false;
+    $formattedMovie['isCatalog']          = true;
+
+    return $formattedMovie;
 }
 
 /**

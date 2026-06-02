@@ -136,13 +136,13 @@ STOP_CLOUDFLARE_TUNNEL.bat
 
 This project was built with a **Vertical Feature Slice** methodology, where each developer owned features end-to-end (from SQL constraints to UI rendering).
 
-* ** Ahmed Khalid** – Public Access & Infrastructure, TMDB Backend Proxy Architecture, Wi-Fi IP Auto-detection, and Concurrency Control.
-* ** Adel Alaa** – User Frontend Journey, Interactive Seat Matrices, SPA Routing, and Simulated Checkout Gateways.
-* ** Bassel Adel** – Dual-Tiered Administrative Workflows, Live Ticket Verification Scanning, Support Threads, and the Virtual Cinema Ecosystem.
+* ** Ahmed Khalid Mohamed** – UI Layout & Navigation, Movie Discovery (Home, Search, Details), TMDB API Integration, and Database Design & Seeding.
+* ** Adel Alaa** – Customer Booking Journey, Interactive Seat Reservations, Payment Processing, QR Ticketing, and User Account Management (Auth, Bookings, Requests).
+* ** Bassel Adel** – Admin Operations & Dashboards, Regional Management, Payment & Refund Control Workflows, Support Threads, and the Virtual Cinema Extension.
 
 ---
 
 ## 📜 License
 
-This project was developed as an academic/portfolio capstone. All movie data, posters, and imagery belong to their respective copyright holders and are fetched via TMDB.
+This project was developed as an academic/portfolio project. All movie data, posters, and imagery belong to their respective copyright holders and are fetched via TMDB.
 ````

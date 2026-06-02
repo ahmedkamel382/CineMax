@@ -39,6 +39,56 @@
 const IMG_W500 = "https://image.tmdb.org/t/p/w500";
 const IMG_ORIG = "https://image.tmdb.org/t/p/original";
 
+const FALLBACK_POSTER_URL = "https://via.placeholder.com/500x750?text=No+Poster";
+const DEFAULT_BACKDROP_URL = "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1920&q=80";
+
+function isMissingMovieImage(url) {
+  if (!url) return true;
+  const value = String(url).trim();
+  return !value ||
+         value.includes('via.placeholder.com') ||
+         value.includes('No+Poster') ||
+         value === DEFAULT_BACKDROP_URL;
+}
+
+function getMoviePosterUrl(movie) {
+  return movie?.posterUrl || movie?.poster || movie?.poster_url || FALLBACK_POSTER_URL;
+}
+
+function getMovieBackdropUrl(movie) {
+  const backdrop = movie?.backdropUrl || movie?.backdrop_url || '';
+  const poster = getMoviePosterUrl(movie);
+  if (isMissingMovieImage(backdrop) && !isMissingMovieImage(poster)) return poster;
+  return backdrop || poster || DEFAULT_BACKDROP_URL;
+}
+
+function getMovieHeroImageInfo(movie) {
+  const backdrop = movie?.backdropUrl || movie?.backdrop_url || '';
+  const poster = getMoviePosterUrl(movie);
+  const usesPosterFallback = isMissingMovieImage(backdrop) && !isMissingMovieImage(poster);
+
+  return {
+    url: usesPosterFallback ? poster : (backdrop || poster || DEFAULT_BACKDROP_URL),
+    usesPosterFallback
+  };
+}
+
+function safeCssImageUrl(url) {
+  return String(url || '').replace(/\\/g, '\\\\').replace(/"/g, '%22');
+}
+
+function setMovieBackground(elementId, url, options = {}) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+
+  el.style.backgroundImage = `url("${safeCssImageUrl(url)}")`;
+
+  // When a movie has no wide cover/backdrop, the hero uses the poster instead.
+  // Poster images must not be cropped/zoom-animated like wide backdrop images.
+  el.classList.toggle('hero-poster-fallback', Boolean(options.posterFallback));
+}
+
+
 /**
  * fetchMovies(type)
  * type = 'now_playing' or 'upcoming'
@@ -499,10 +549,11 @@ function renderMovieGrids(filter = '') {
 
 /** Returns the HTML string for a single movie card. */
 function movieCardHTML(movie) {
+  const posterUrl = getMoviePosterUrl(movie);
   return `
     <div class="movie-card group cursor-pointer" data-id="${movie.id}">
       <div class="poster-wrap relative aspect-[2/3] rounded-xl overflow-hidden border border-white/5 bg-white/5 group-hover:border-brand transition-colors duration-300">
-        <img src="${esc(movie.posterUrl)}" alt="${esc(movie.title)}"
+        <img src="${esc(posterUrl)}" alt="${esc(movie.title)}"
              loading="lazy" class="w-full h-full object-cover" />
         <div class="overlay absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3">
           <h3 class="text-xs font-bold text-white leading-tight">${esc(movie.title)}</h3>
@@ -521,13 +572,15 @@ function movieCardHTML(movie) {
 
 /**
  * startHeroCarousel()
- * Rotates through the first 5 now-showing movies every 10 seconds.
+ * Rotates through all available now-showing movies every 10 seconds.
+ * Coming-soon movies are excluded because they cannot be booked yet.
  */
 function startHeroCarousel() {
   if (state.heroInterval) clearInterval(state.heroInterval);
-  const movies = state.nowShowing.slice(0, 5);
+  const movies = state.nowShowing.filter(movie => !movie.isComingSoon);
   if (!movies.length) return;
 
+  state.heroIndex = state.heroIndex % movies.length;
   setHeroMovie(movies[state.heroIndex]);
 
   state.heroInterval = setInterval(() => {
@@ -549,7 +602,8 @@ function startHeroCarousel() {
 /** Fills the left-side hero panel with a movie's data. */
 function setHeroMovie(movie) {
   if (!movie) return;
-  document.getElementById('featured-backdrop').style.backgroundImage = `url('${movie.backdropUrl}')`;
+  const heroImage = getMovieHeroImageInfo(movie);
+  setMovieBackground('featured-backdrop', heroImage.url, { posterFallback: heroImage.usesPosterFallback });
   document.getElementById('featured-title').textContent = movie.title;
   document.getElementById('featured-desc').textContent  = movie.description;
   document.getElementById('featured-imdb').textContent  = movie.imdbRating;
@@ -582,15 +636,15 @@ async function openDetails(movie, isBack = false) {
   showView('details');
 
   // Stage 1: render immediately with what we already know
-  document.getElementById('details-backdrop').style.backgroundImage = `url('${movie.backdropUrl}')`;
-  document.getElementById('details-poster').src = movie.posterUrl;
+  setMovieBackground('details-backdrop', getMovieBackdropUrl(movie));
+  document.getElementById('details-poster').src = getMoviePosterUrl(movie);
   document.getElementById('details-title').textContent    = movie.title;
   document.getElementById('details-imdb').textContent     = movie.imdbRating;
   document.getElementById('details-rt').textContent       = movie.rtRating;
   document.getElementById('details-genres').textContent   = (movie.genres || []).join(' • ');
   document.getElementById('details-desc').textContent     = movie.description;
 
-  // --- UI Routing: Tickets vs Streaming ---
+// --- UI Routing: Tickets vs Streaming ---
   const typeEl = document.getElementById('details-type-badge');
   const bookBtn = document.getElementById('details-book-btn');
   const streamingSection = document.getElementById('streaming-section');
@@ -599,16 +653,16 @@ async function openDetails(movie, isBack = false) {
   bookBtn.classList.add('hidden');
   if (streamingSection) streamingSection.classList.add('hidden');
 
-  if (movie.isComingSoon) {
+  if (movie.isCatalog) {
+    // Check catalog FIRST. If it is an actor's past movie, show streaming
+    typeEl.innerHTML = '<span class="type-badge film" style="background:rgba(255,255,255,0.1); color:white; border-color:rgba(255,255,255,0.2)">🎞️ Classic Release</span>';
+    loadStreamingProviders(movie.tmdbId);
+  } else if (movie.isComingSoon) {
     typeEl.innerHTML = '<span class="type-badge event">🗓 Coming Soon</span>';
   } else if (movie.isCurrentlyPlaying) {
     typeEl.innerHTML = '<span class="type-badge film">🎬 Now Showing</span>';
     bookBtn.classList.remove('hidden');
     bookBtn.onclick = () => openBookingModal();
-  } else if (movie.isCatalog) {
-    typeEl.innerHTML = '<span class="type-badge film" style="background:rgba(255,255,255,0.1); color:white; border-color:rgba(255,255,255,0.2)">🎞️ Classic Release</span>';
-    // It's an old movie! Fetch streaming providers instead of showing tickets
-    loadStreamingProviders(movie.tmdbId);
   }
   // -----------------------------------------
 
@@ -644,23 +698,31 @@ async function loadStreamingProviders(tmdbId) {
   streamingBadges.innerHTML = '<span class="text-xs text-gray-500 animate-pulse">Checking providers...</span>';
 
   try {
-    const res = await api('streaming_providers', { tmdb_id: tmdbId });
-    const providers = (res.status === 'success' ? res.providers : []) || [];
+    // 1. Try Egypt first
+    let res = await api('streaming_providers', { tmdb_id: tmdbId, region: 'EG' });
+    let providers = (res.status === 'success' ? res.providers : []) || [];
+
+    // 2. If nothing in Egypt, try US fallback
+    if (providers.length === 0) {
+      res = await api('streaming_providers', { tmdb_id: tmdbId, region: 'US' });
+      providers = (res.status === 'success' ? res.providers : []) || [];
+    }
 
     if (providers.length > 0) {
       streamingBadges.innerHTML = providers.map(p => `
-        <div class="flex flex-col items-center justify-center bg-white/5 rounded-lg p-2 border border-white/10 gap-1 text-xs text-center">
+        <div class="flex flex-col items-center justify-center bg-white/5 rounded-lg p-2 border border-white/10 gap-1 text-xs text-center cursor-default">
           ${p.logo_url ? `<img src="${esc(p.logo_url)}" class="w-8 h-8 rounded shadow-sm" alt="${esc(p.provider_name)}" />` : ''}
           <span class="text-[10px] text-gray-300 truncate w-full">${esc(p.provider_name)}</span>
         </div>
       `).join('');
     } else {
-      streamingBadges.innerHTML = '<span class="text-xs text-gray-500">Not currently streaming on major platforms.</span>';
+      streamingBadges.innerHTML = '<span class="text-xs text-gray-500">Not currently streaming on major regional platforms.</span>';
     }
   } catch(e) {
     streamingSection.classList.add('hidden');
   }
 }
+
 /** Renders clickable cast chips below the synopsis. Clicking opens person profile. */
 function renderCast(cast) {
   const section = document.getElementById('cast-section');
@@ -1394,7 +1456,7 @@ async function createPayment(paymentMethod) {
     showtime_id: state.currentShowtime.id,
     tmdb_id: state.selectedMovie.tmdbId,
     movie_title: state.selectedMovie.title,
-    movie_poster: state.selectedMovie.posterUrl,
+    movie_poster: getMoviePosterUrl(state.selectedMovie),
     seats: state.selectedSeats,
     payment_method: paymentMethod,
     payment_details: paymentDetails,
@@ -2469,8 +2531,8 @@ function updateNavForAuth() {
     btn.title = `Account: ${accountName}`;
     btn.classList.add('is-account-btn');
     btn.onclick     = openAccountModal;
-    if (bookingsBtn) bookingsBtn.classList.remove('hidden');
-    if (requestsBtn) requestsBtn.classList.remove('hidden');
+    if (bookingsBtn) bookingsBtn.classList.add('hidden');
+    if (requestsBtn) requestsBtn.classList.add('hidden');
   } else {
     btn.textContent = 'Sign In';
     btn.title = 'Sign In';
@@ -2883,6 +2945,14 @@ function setupNavigation() {
   document.getElementById('requests-back-btn')?.addEventListener('click', goHome);
   document.getElementById('nav-cinemas-btn')?.addEventListener('click', openCinemasModal);
   document.getElementById('nav-payments-btn')?.addEventListener('click', openMyBookingsModal);
+  document.getElementById('account-my-requests-btn')?.addEventListener('click', () => {
+    document.getElementById('account-modal')?.classList.add('hidden');
+    openRequestsView();
+  });
+  document.getElementById('account-my-bookings-btn')?.addEventListener('click', () => {
+    document.getElementById('account-modal')?.classList.add('hidden');
+    openMyBookingsModal();
+  });
   document.getElementById('nav-virtual-cinema-top-btn')?.addEventListener('click', openVirtualCinemaDemo);
   document.getElementById('login-btn')?.addEventListener('click', () => {
     if (!state.isLoggedIn) showAuthModal('login');
@@ -3122,16 +3192,30 @@ async function openPersonView(personId, isBack = false) {
  * If not, fetches it fresh from TMDB and opens the details view.
  */
 async function openPersonMovieDetails(tmdbId) {
+  // Convert TMDB ID to a number for safe comparison
+  const targetId = Number(tmdbId);
 
-  // Check local cache first — avoids an extra API call for current movies
-  const cached = [...state.nowShowing, ...state.comingSoon]
-      .find(m => m.tmdbId === tmdbId || m.id === String(tmdbId));
-  if (cached) { openDetails(cached); return; }
+  // 1. Check if it's currently playing in our cinemas right now
+  const cached = [...state.nowShowing, ...state.comingSoon].find(m => Number(m.tmdbId) === targetId || Number(m.id) === targetId);
 
-  // Not cached → ask the backend, which talks to TMDB on our behalf
-  const res = await api('movie_details', { tmdb_id: tmdbId });
+  if (cached) {
+    // It's a live cinema movie! Open normally.
+    openDetails(cached);
+    return;
+  }
+
+  // 2. Not cached → It's an old/classic movie. Fetch from TMDB proxy.
+  const res = await api('movie_details', { tmdb_id: targetId });
   if (res.status !== 'success' || !res.movie) return;
-  const movie = { ...res.movie, isCatalog: true };  // flag enables streaming providers UI
+
+  // 3. FORCE the overrides. We must explicitly disable the live flags
+  // and enable isCatalog so openDetails routes it to the streaming UI.
+  const movie = {
+    ...res.movie,
+    isCurrentlyPlaying: false, // Force disable Tickets button
+    isComingSoon: false,       // Force disable Coming Soon badge
+    isCatalog: true            // Force enable Streaming badges
+  };
   openDetails(movie);
 }
 

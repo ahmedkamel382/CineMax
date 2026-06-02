@@ -67,6 +67,35 @@ body {
 }
 
 
+.account-action-btn {
+  width: 100%;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 14px;
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  transition: background-color 150ms, border-color 150ms, transform 150ms;
+}
+.account-action-btn:hover {
+  background: rgba(225,29,72,0.18);
+  border-color: rgba(225,29,72,0.45);
+}
+.account-action-btn:active { transform: scale(0.97); }
+
+/* User-specific pages now live inside Account, so the navbar stays clean on medium PC widths. */
+#nav-requests-btn,
+#nav-payments-btn {
+  display: none !important;
+}
+
+
 /* ---------- 4. GLASS PANEL ---------- */
 .glass {
   background-color: rgba(255, 255, 255, 0.05);
@@ -75,6 +104,18 @@ body {
 }
 .main-gradient {
   background-image: linear-gradient(to right, #0A0A0B, rgba(10,10,11,0.8), transparent);
+}
+
+/* Poster fallback for movies with no wide cover/backdrop.
+   Keeps the main poster visible without the hero crop/zoom effect. */
+#featured-backdrop.hero-poster-fallback {
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  transform: none !important;
+}
+.group:hover #featured-backdrop.hero-poster-fallback {
+  transform: none !important;
 }
 
 

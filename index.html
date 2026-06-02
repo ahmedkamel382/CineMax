@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cinemax Egypt</title>
-  <link rel="stylesheet" href="style.css?v=20260601-account-nav-fit" />
+  <link rel="stylesheet" href="style.css?v=20260602-account-requests-hero-fallback" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
   <script>
@@ -45,8 +45,8 @@
       <button class="nav-link" id="nav-movies-btn">Movies</button>
       <button class="nav-link" id="nav-cinemas-btn">Cinemas</button>
       <button class="nav-link" id="nav-support-btn">Support</button>
-      <button class="nav-link hidden" id="nav-requests-btn">My Requests</button>
-      <button class="nav-link hidden" id="nav-payments-btn">My Bookings</button>
+      <button class="nav-link hidden" id="nav-requests-btn" aria-hidden="true" tabindex="-1">My Requests</button>
+      <button class="nav-link hidden" id="nav-payments-btn" aria-hidden="true" tabindex="-1">My Bookings</button>
     </div>
   </div>
 
@@ -658,8 +658,19 @@
         <div id="account-email" class="text-sm text-gray-300 break-all"></div>
       </div>
 
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+        <button id="account-my-requests-btn" class="account-action-btn" type="button">
+          <span class="text-lg">💬</span>
+          <span>My Requests</span>
+        </button>
+        <button id="account-my-bookings-btn" class="account-action-btn" type="button">
+          <span class="text-lg">🎟️</span>
+          <span>My Bookings</span>
+        </button>
+      </div>
+
       <div class="mb-5">
-        <h3 class="text-sm font-black uppercase tracking-[0.2em] text-gray-500 mb-3">My Bookings</h3>
+        <h3 class="text-sm font-black uppercase tracking-[0.2em] text-gray-500 mb-3">Latest Bookings</h3>
         <div id="account-bookings-list"></div>
       </div>
 
