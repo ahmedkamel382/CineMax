@@ -37,7 +37,7 @@ require_once 'db.php';
 
 $TMDB_BEARER = defined('TMDB_BEARER_TOKEN') ? TMDB_BEARER_TOKEN : ($_ENV['TMDB_BEARER_TOKEN'] ?? '');
 if (!$TMDB_BEARER) {
-    die("ERROR: TMDB_BEARER_TOKEN not set in config.php\nGet a free key at https://www.themoviedb.org/settings/api\n");
+    die("ERROR: TMDB_BEARER_TOKEN not set in config.php\nGet a free key at https://www.themoviedb.org/settings/apin");
 }
 
 define('TMDB_BASE', 'https://api.themoviedb.org/3');
@@ -159,19 +159,45 @@ foreach ($endpointMap as $endpoint => $generateShowtimesFlag) {
                 if (empty($m['release_date'])) continue;
 
                 // ── SAME DATE FILTER AS FRONTEND ──────────────────
-                // now_playing: only movies already released
-                // upcoming:    only truly future movies (no old ones!)
                 if ($endpoint === 'now_playing' && $m['release_date'] > $today) continue;
-                if ($endpoint === 'upcoming'    && $m['release_date'] <= $today) continue;
+                if ($endpoint === 'upcoming' && $m['release_date'] <= $today) continue;
+
+                // ── GUARD 1: STRICT LANGUAGE CURATION ──
+                // Blocks Indian (hi) and other non-target regional languages completely
+                $lang = $m['original_language'] ?? '';
+                if ($lang !== 'ar' && $lang !== 'en') {
+                    continue;
+                }
 
                 $tmdbId = (int)$m['id'];
-                $title  = $m['title'] ?? $m['original_title'] ?? 'Unknown';
+                $title = $m['title'] ?? $m['original_title'] ?? 'Unknown';
                 $poster = $m['poster_path'] ? IMG_W500 . $m['poster_path'] : null;
+
+                // ── GUARD 2: BLOCK STREAMING-EXCLUSIVE TITLES (Netflix, Disney+, etc.) ──
+                $pr = tmdb("/movie/{$tmdbId}/watch/providers", $TMDB_BEARER);
+                $usFlat = $pr['results']['US']['flatrate'] ?? [];
+                $egFlat = $pr['results']['EG']['flatrate'] ?? [];
+                $flatrate = array_merge($usFlat, $egFlat);
+
+                // Match against enterprise streaming provider IDs
+                $streamingIds = [8, 9, 337, 384, 350, 15, 283, 531];
+                $hasStreaming = false;
+                foreach ($flatrate as $p) {
+                    if (in_array((int)($p['provider_id'] ?? 0), $streamingIds, true)) {
+                        $hasStreaming = true;
+                        break;
+                    }
+                }
+
+                // If it's a streaming-exclusive (like a Netflix Original), skip scheduling it
+                if ($hasStreaming) {
+                    continue;
+                }
 
                 // Skip if we already have showtimes for this movie
                 $futureCount = $futureShowtimeCounts[$tmdbId] ?? 0;
 
-                // Generate showtimes for new now_playing movies
+                // ── RESTORED: GENERATE SHOWTIMES LOGIC ──
                 if ($generateShowtimesFlag && $halls) {
                     if ($futureCount >= 120) {
                         $stats['skipped']++;
